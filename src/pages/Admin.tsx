@@ -1,5 +1,5 @@
 import React from 'react'
-import { supabase } from '../utils/supabaseClient'
+import supabase from '../utils/supabaseClient'
 
 const Admin: React.FC = () => {
   const [isAdmin, setIsAdmin] = React.useState(false)
@@ -12,7 +12,7 @@ const Admin: React.FC = () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       const { data: profile } = await supabase
-        .from('profiles')
+        .from('users')
         .select('is_admin')
         .eq('id', user.id)
         .single()
