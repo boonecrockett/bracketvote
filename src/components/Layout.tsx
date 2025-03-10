@@ -1,27 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import useAuthStore from '../store/useAuthStore';
-import Auth from './Auth';
-
-// DEVELOPER NOTE:
-// This is a modified Layout component that works with our bypassed auth
-// and can fall back to a mock user when needed to prevent infinite loops.
 
 const Layout: React.FC = () => {
-  // Try to use the real auth store, but we're not dependent on it
   const authState = useAuthStore();
-  
-  // Get mock user from window if it exists
-  // @ts-ignore - we know this property exists from our App.tsx
-  const mockUser = window.__MOCK_USER;
-  
-  // Use real auth user if available, otherwise fall back to mock
-  const user = authState.user || mockUser;
-  const anonymousUser = authState.anonymousUser || false;
-  
-  // We implement our own version of these functions that don't depend on auth store
-  const [showAuth, setShowAuth] = useState(false);
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const { user, anonymousUser, signOut } = authState;
   const location = useLocation();
 
   // Add debugging information
@@ -29,37 +12,6 @@ const Layout: React.FC = () => {
 
   // Helper to determine if a link is active
   const isActive = (path: string) => location.pathname === path;
-
-  const handleOpenSignIn = () => {
-    setAuthMode('signin');
-    setShowAuth(true);
-  };
-
-  const handleOpenSignUp = () => {
-    setAuthMode('signup');
-    setShowAuth(true);
-  };
-
-  const handleAuthSuccess = () => {
-    setShowAuth(false);
-    
-    // Dispatch a custom event that components can listen for to refresh their data
-    if (typeof window !== 'undefined') {
-      const authEvent = new CustomEvent('auth-state-changed', {
-        detail: { action: 'login' }
-      });
-      window.dispatchEvent(authEvent);
-    }
-  };
-
-  const handleSignOut = async () => {
-    // Try to use real auth if available
-    if (authState.signOut) {
-      await authState.signOut();
-    } else {
-      console.log('Using mock signOut');
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
