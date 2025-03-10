@@ -18,7 +18,7 @@ const Leaderboard: React.FC = () => {
   const fetchLeaderboard = async () => {
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('users')
         .select('id, username, score')
         .order('score', { ascending: false })
         .limit(10)
@@ -44,9 +44,9 @@ const Leaderboard: React.FC = () => {
           <div key={entry.id} className="flex items-center justify-between">
             <div className="flex items-center">
               <span className="text-gray-500 w-8">{index + 1}.</span>
-              <span>{entry.username}</span>
+              <span>{entry.username || 'Anonymous'}</span>
             </div>
-            <span className="font-semibold">{entry.score}</span>
+            <span className="font-semibold">{entry.score || 0}</span>
           </div>
         ))}
       </div>
